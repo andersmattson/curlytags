@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<title>bam.tpl tests</title>
+		<script src="bam.tpl.js"></script>
+		<script src="data.js"></script>
+		<style>
+			body {
+				background-color: green;
+			}
+		</style>
+	</head>
+	<body>
+		{% cache %}
+		{% extends 'tplbase.html' %}
+		Other info
+		{% block body %}
+			{{ document.location.href }}<br>
+			{% for p in projects %}
+				<span class="cycle">{% cycle "A" "B" %}</span>
+				{% if p.active %}Active{% else %}Not active{% endif %}
+				Project is named:{{ p.name }} and is due {{ p.deadline|linebreaksbr }}<br>
+			{% endfor %}
+			{% include 'tplext.html' %}
+		{% endblock %}
+	</body>
+</html>

@@ -1,0 +1,4 @@
+body {
+	background-color: {{ bgcolor }};
+	font-family: Verdana, sans-serif;
+}

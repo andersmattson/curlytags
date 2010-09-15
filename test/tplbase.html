@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<title>bam.tpl tests (from base file)</title>
+		<link rel="stylesheet" href="csstemplate.css" />
+		<link rel="favicon" href="icon.png" />
+		<script src="bam.tpl.js?autoload=1"></script>
+		<script src="data.js"></script>
+		<style>
+			body {
+				font-weight: bold;
+			}
+
+			.cycle {
+				color: {{ looks.cycle_color }};
+			}
+		</style>
+	</head>
+	<body>
+		Before base file's original content<br>
+		{% block body %}
+			Original content
+		{% endblock %}<br>
+		After
+	</body>
+</html>
