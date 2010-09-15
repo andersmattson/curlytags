@@ -1,5 +1,5 @@
 /*
- *	curlyTags JavaScript Template Engine
+ *	curlyTags JavaScript Template Engine v1.0
  *	
  *	Copyright 2010, Anders Mattson
  *	Licensed under the MIT or GPL Version 2 licenses.
@@ -10,9 +10,10 @@ var curlyTags = window.curlyTags || {};
 
 var undefined;
 
-(function(N){
+(function(curlyTags){
 
-N.is = function(o,t) {
+// Type testing function
+curlyTags.is = function(o,t) {
 	return Object.prototype.toString.call(o).toLowerCase() === "[object " + t + "]";
 };
 
@@ -20,14 +21,14 @@ N.is = function(o,t) {
  * A shamelessly copied version of the jQuery.extend and jQuery.inArray functions
  * by John Resig and the jQuery team http://jquery.com
  */
-N.extend = function() {
+curlyTags.extend = function() {
 	var t = arguments[0] || {}, i = 1, l = arguments.length, d = false, o;
 	if ( typeof t === "boolean" ) {
 		d = t;
 		t = arguments[1] || {};
 		i = 2;
 	}
-	if ( typeof t !== "object" && !N.is(t,'function') )
+	if ( typeof t !== "object" && !curlyTags.is(t,'function') )
 		t = {};
 	if ( l == i ) {
 		t = this;
@@ -40,14 +41,14 @@ N.extend = function() {
 				if ( t === c )
 					continue;
 				if ( d && c && typeof c === "object" && !c.nodeType )
-					t[ n ] = N.extend( d, s || ( c.length != null ? [ ] : { } ), c );
+					t[ n ] = curlyTags.extend( d, s || ( c.length != null ? [ ] : { } ), c );
 				else if ( c !== undefined )
 					t[ n ] = c;
 			}
 	return t;
 };
 	
-N.extend(N,{
+curlyTags.extend(curlyTags,{
 	
 	/*
 	 * A shamelessly copied version of the jQuery.inArray function
@@ -67,7 +68,7 @@ N.extend(N,{
 	 */
 	uuid: function(prefix) {
 		prefix = prefix || 'curlytags';
-		return prefix + ++N._uuid;
+		return prefix + ++curlyTags._uuid;
 	},
 	
 	/**
@@ -88,12 +89,12 @@ N.extend(N,{
 	
 	    var async = true;
 
-	    N.xhr.open('GET', url, async);
-	    N.xhr.send(null);
+	    curlyTags.xhr.open('GET', url, async);
+	    curlyTags.xhr.send(null);
 
 	    if (async) {
-	        N.xhr.onreadystatechange = function () {
-	            if (N.xhr.readyState == 4)
+	        curlyTags.xhr.onreadystatechange = function () {
+	            if (curlyTags.xhr.readyState == 4)
 	                cb(fn, errfn);
 	        };
 	    }
@@ -101,10 +102,10 @@ N.extend(N,{
 	        cb(fn, errfn);
 	
 	    function cb(fn, errfn) {
-	        if (N.xhr.status >= 200 && N.xhr.status < 300)
-	            fn(N.xhr.responseText, N.xhr.getResponseHeader("Last-Modified"));
+	        if (curlyTags.xhr.status >= 200 && curlyTags.xhr.status < 300)
+	            fn(curlyTags.xhr.responseText, curlyTags.xhr.getResponseHeader("Last-Modified"));
 	        else if (typeof(errfn) === 'function')
-	            errfn(N.xhr.status, url);
+	            errfn(curlyTags.xhr.status, url);
 	    }
 	},
 	
@@ -141,7 +142,7 @@ N.extend(N,{
 		 * @param {Object} regexp
 		 */
 		splitmatch: function(s, regexp) {
-			var ret = [], spl = N.re.split(s, regexp), match = s.match(regexp), a, b, l;
+			var ret = [], spl = curlyTags.re.split(s, regexp), match = s.match(regexp), a, b, l;
 
 			if (spl && match) {
 				a = spl.length > match.length ? spl : match, b = spl.length < match.length ? spl : match;
@@ -169,7 +170,7 @@ N.extend(N,{
 		 */
 		split: function (str, separator, limit) {
 		    // if `separator` is not a regex, use the native `split`
-		    if (!N.is(separator, 'regexp'))
+		    if (!curlyTags.is(separator, 'regexp'))
 		        return String.prototype.split.call(str, separator, limit);
 		
 		    var output = [],
@@ -181,7 +182,7 @@ N.extend(N,{
 		        separator2, match, lastIndex, lastLength;
 		
 		    str = str + ""; // type conversion
-		    if (!N.re._compliantExecNpcg)
+		    if (!curlyTags.re._compliantExecNpcg)
 		        separator2 = RegExp("^" + separator.source + "$(?!\\s)", flags); // doesn't need /g or /y, but they don't hurt
 		
 		    if (limit === undefined || +limit < 0)
@@ -199,7 +200,7 @@ N.extend(N,{
 		            output.push(str.slice(lastLastIndex, match.index));
 		
 		            // fix browsers whose `exec` methods don't consistently return `undefined` for nonparticipating capturing groups
-		            if (!N.re._compliantExecNpcg && match.length > 1) {
+		            if (!curlyTags.re._compliantExecNpcg && match.length > 1) {
 		                match[0].replace(separator2, function () {
 		                    for (var i = 1; i < arguments.length - 2; i++)
 		                        if (arguments[i] === undefined)
@@ -287,23 +288,23 @@ N.extend(N,{
 			
 			var o;
 			
-			if(!N.is(O,'array'))
+			if(!curlyTags.is(O,'array'))
 				O = [O];
 			
 			for(var i in O) {
 				o = O[i];
 				if(o.type == 'filter')
-					N.filters[o.name] = o.fn;
+					curlyTags.filters[o.name] = o.fn;
 				else {
-					N.blocktags[o.name] = o.fn;
+					curlyTags.blocktags[o.name] = o.fn;
 					if(o.type == 'block') {
-						N.defs.startblocks.push(o.name);
-						N.defs.endblocks.push("end"+o.name);
-						N.re.pairs['end'+o.name] = new RegExp("/^\{\%\s*" + o.name + "\s+/", "i");
+						curlyTags.defs.startblocks.push(o.name);
+						curlyTags.defs.endblocks.push("end"+o.name);
+						curlyTags.re.pairs['end'+o.name] = new RegExp("/^\{\%\s*" + o.name + "\s+/", "i");
 						if (o.elseblock) {
-							N.defs.elseblocks[o.name] = new RegExp("/\{\%\s*" + o.elseblock + "\s*\%\}/", "gi");
-							if(N.defs.elsenames.indexOf(o.elseblock)==-1)
-								N.defs.elsenames.push(o.elseblock);
+							curlyTags.defs.elseblocks[o.name] = new RegExp("/\{\%\s*" + o.elseblock + "\s*\%\}/", "gi");
+							if(curlyTags.defs.elsenames.indexOf(o.elseblock)==-1)
+								curlyTags.defs.elsenames.push(o.elseblock);
 						}
 					}
 				}
@@ -315,7 +316,7 @@ N.extend(N,{
 		 * This or the replaceData function, depending on the need, can be used in JSONP calls.
 		 */
 		loadData: function(d) {
-			N.data = N.extend(N.data || {}, d);
+			curlyTags.data = curlyTags.extend(curlyTags.data || {}, d);
 		},
 		
 		/*
@@ -323,7 +324,7 @@ N.extend(N,{
 		 * This or the loadData function, depending on the need, can be used in JSONP calls.
 		 */
 		replaceData: function(d) {
-			N.data = d;
+			curlyTags.data = d;
 		},
 		/**
 		 * Some definitions for the initial block tags and filters.
@@ -350,29 +351,29 @@ N.extend(N,{
 		strtolex: function(str) {
 			
 			var b, lex = [], tag, block, elsetag, elsecontent, eltag, push, cur,
-				B = N.is(str,"string") ? N.re.splitmatch(str, N.re.blocktag_all) : str;
+				B = curlyTags.is(str,"string") ? curlyTags.re.splitmatch(str, curlyTags.re.blocktag_all) : str;
 
 			while(B.length){
 				b = B.shift();
-				if(N.is(b,"string") && b.indexOf("{%") == 0) {
+				if(curlyTags.is(b,"string") && b.indexOf("{%") == 0) {
 					
-					tag = b.match(N.re.blocktag2);
+					tag = b.match(curlyTags.re.blocktag2);
 					
 					if(tag[1]){
-						if(N.inArray(tag[1],N.defs.endblocks) > -1){
+						if(curlyTags.inArray(tag[1],curlyTags.defs.endblocks) > -1){
 							block = [];
-							elsetag = N.defs.elseblocks[tag[1].replace(N.re.trimend, '')];
+							elsetag = curlyTags.defs.elseblocks[tag[1].replace(curlyTags.re.trimend, '')];
 		
 							elsecontent = [], push = true, eltag = null;
 							while (lex.length) {
 								cur = lex.pop();
-								if (N.is(cur, "string")) {
-									if (cur.match(N.re.pairs[tag[1]])) {
+								if (curlyTags.is(cur, "string")) {
+									if (cur.match(curlyTags.re.pairs[tag[1]])) {
 										lex.push({
 											type: 			tag[1].replace(/^end/i, ''),
-											condition: 		cur.replace(N.re.trimblock, '').replace(tag[1].replace(N.re.trimend, ''), '').replace(N.re.trim, ''),
-											content: 		N.strtolex(block),
-											elsecontent: 	elsecontent.length ? N.strtolex(elsecontent) : null,
+											condition: 		cur.replace(curlyTags.re.trimblock, '').replace(tag[1].replace(curlyTags.re.trimend, ''), '').replace(curlyTags.re.trim, ''),
+											content: 		curlyTags.strtolex(block),
+											elsecontent: 	elsecontent.length ? curlyTags.strtolex(elsecontent) : null,
 											elsetag: 		eltag,
 											endtag: 		tag[1]
 										});
@@ -391,10 +392,10 @@ N.extend(N,{
 								
 							}
 						}
-						else if(N.inArray(tag[1], N.defs.startblocks)>-1 || N.inArray(tag[1], N.defs.elsenames) > -1)
+						else if(curlyTags.inArray(tag[1], curlyTags.defs.startblocks)>-1 || curlyTags.inArray(tag[1], curlyTags.defs.elsenames) > -1)
 							lex.push(b);
 						else {
-							var vars = N.strsplit(b.replace(N.re.trimblock,''));
+							var vars = curlyTags.strsplit(b.replace(curlyTags.re.trimblock,''));
 							vars.shift();
 							lex.push({
 								type: tag[1],
@@ -418,18 +419,18 @@ N.extend(N,{
 			var out = [], l = lex.length;
 			
 			for(var i = 0; i < l; i++) {
-				if(N.is(lex[i], "string"))
+				if(curlyTags.is(lex[i], "string"))
 					out.push(lex[i]);
 				else if(lex[i].vars)
 					out.push('{% ' + lex[i].type + ' ' + lex[i].vars.join(' ') + ' %}');
 				else {
 					out.push('{% ' + lex[i].type + ' ' + lex[i].condition + ' %}');
-					out.push(N.lextostr(lex[i].content));
+					out.push(curlyTags.lextostr(lex[i].content));
 					
 					if(lex[i].elsetag) {
 						out.push(lex[i].elsetag);
 						if(lex[i].elsecontent)
-							out.push(N.lextostr(lex[i].elsecontent));
+							out.push(curlyTags.lextostr(lex[i].elsecontent));
 					}
 					
 					out.push('{% ' + lex[i].endtag + ' %}');
@@ -450,24 +451,24 @@ N.extend(N,{
 			
 			var out = [], lex;
 
-			if (N.is(str, "string")) {
+			if (curlyTags.is(str, "string")) {
 				if(!str.length)
 					return str;
-				lex = N.strtolex(str);
+				lex = curlyTags.strtolex(str);
 			}
 			else 
 				lex = str;
 
 			if(d2)
-				N.extend(d1, d2);
+				curlyTags.extend(d1, d2);
 			
 			for(var c in lex) {
-				if(N.is(lex[c], "string"))
-					out.push(N.parsevar(lex[c], d1));
+				if(curlyTags.is(lex[c], "string"))
+					out.push(curlyTags.parsevar(lex[c], d1));
 				else {
-					if(!N.blocktags[lex[c].type])
+					if(!curlyTags.blocktags[lex[c].type])
 						throw new Error("Template error: blocktag '" + lex[c].type + "' does not exist");
-					out.push(N.blocktags[lex[c].type].call(lex[c], lex[c].vars, d1));
+					out.push(curlyTags.blocktags[lex[c].type].call(lex[c], lex[c].vars, d1));
 				}
 			}
 			return out.join('');
@@ -483,13 +484,13 @@ N.extend(N,{
 		parsevar: function(d, d1, d2) {
 
 			if (d2) 
-				N.extend(d1, d2);
+				curlyTags.extend(d1, d2);
 			
-			var tags = d.match(N.re.tag);
+			var tags = d.match(curlyTags.re.tag);
 
 			if(tags)
 				for(var i = 0, l = tags.length; i < l; i++)
-					d = d.replace(tags[i], N._parsevar(tags[i].replace(N.re.trim_var, ''), d1));
+					d = d.replace(tags[i], curlyTags._parsevar(tags[i].replace(curlyTags.re.trim_var, ''), d1));
 
 			return d;
 		},
@@ -503,33 +504,33 @@ N.extend(N,{
 		_parsevar: function(tagstr, d1) {
 			
 			var sfn, fn_parts, fnname, sfn_parts, args, parts = tagstr.split('|');
-			var value = N.evalvar(parts.shift(), d1);
+			var value = curlyTags.evalvar(parts.shift(), d1);
 			
 			if (value === null) value = '';
 			
 			if(parts.length) {
 				while(sfn = parts.shift()) {
-					sfn = sfn.replace(N.re.trim, '');
-					if(sfn.match(N.re.pspl)) {
+					sfn = sfn.replace(curlyTags.re.trim, '');
+					if(sfn.match(curlyTags.re.pspl)) {
 						fn_parts = sfn.split('(');
 						fnname = fn_parts.shift();
 						sfn = fn_parts.join('');
 						sfn_parts = [value];
-						args = N.varssplit(sfn.replace(N.re.trimp,''));
+						args = curlyTags.varssplit(sfn.replace(curlyTags.re.trimp,''));
 						for (var j = 0; j < args.length; j++) {
-							args[j] = N.evalvar(args[j], d1);
+							args[j] = curlyTags.evalvar(args[j], d1);
 							sfn_parts.push(args[j]);
 						}
-						value = N.filters[fnname.replace(N.re.trim, '')].apply(N, sfn_parts);
+						value = curlyTags.filters[fnname.replace(curlyTags.re.trim, '')].apply(N, sfn_parts);
 					}
-					else if (sfn.match(N.re.cspl)) {
+					else if (sfn.match(curlyTags.re.cspl)) {
 						fn_parts = sfn.split(':');
 						fnname = fn_parts[0];
-						args = N.evalvar(fn_parts[1], d1);
-						value = N.filters[fnname.replace(N.re.trim, '')].apply(N, [value, args]);
+						args = curlyTags.evalvar(fn_parts[1], d1);
+						value = curlyTags.filters[fnname.replace(curlyTags.re.trim, '')].apply(N, [value, args]);
 					}
 					else
-						value = N.filters[sfn](value);
+						value = curlyTags.filters[sfn](value);
 				}
 			}
 			return value;
@@ -542,8 +543,8 @@ N.extend(N,{
 		 * @param {Object} f
 		 */
 		render: function(u, D, f) {
-			N.ajax( u, function( d ) {
-				N.render_string_c(d, D, f);
+			curlyTags.ajax( u, function( d ) {
+				curlyTags.render_string_c(d, D, f);
 			}, true);
 		},
 		
@@ -558,19 +559,19 @@ N.extend(N,{
 		render_string_c: function(str, D, fn) {
 			var include, xtends;
 
-			if(N.is(D,'function')) {
+			if(curlyTags.is(D,'function')) {
 				fn = D;
 				D = {};
 			}
 			
-			if(xtends = str.match(N.re.xtends)) {
-				N.ajax(xtends[1], function(d){
+			if(xtends = str.match(curlyTags.re.xtends)) {
+				curlyTags.ajax(xtends[1], function(d){
 
 					// If this is a document and it inherits another document (rather than being just a string)
 					// we need to transfer the head info (links, scripts and styles) to 
 					// the current document.
 					// For now, this only happens if the document is autoloaded.
-					if(N.fullextend && N.autoload && (d.toUpperCase().indexOf('<!DOCTYPE') === 0)) {
+					if(curlyTags.fullextend && curlyTags.autoload && (d.toUpperCase().indexOf('<!DOCTYPE') === 0)) {
 						var body, head = "";
 						
 						// Parse the header content and add it to the bottom of the document.
@@ -603,8 +604,8 @@ N.extend(N,{
 					if(self = d.match(/<script[^>]*?src="[^"]*?bam.tpl.js[^"]*?"[^>]*?>(<\/script>)?/i))
 						d = d.replace(self[0], '');
 					
-					var base = N.strtolex(d),
-						xt = N.strtolex(str),
+					var base = curlyTags.strtolex(d),
+						xt = curlyTags.strtolex(str),
 						blocks = {};
 					
 					str = str.replace(xtends[0], '');
@@ -614,23 +615,23 @@ N.extend(N,{
 							blocks[xt[i].condition] = xt[i].content;
 					
 					// Handle the replacement of block tags
-					str = N.lextostr(N.replace_blocks(base, blocks));
+					str = curlyTags.lextostr(curlyTags.replace_blocks(base, blocks));
 					
-					N.render_string_c(str, D, fn);
+					curlyTags.render_string_c(str, D, fn);
 				});
 			}
-			else if (include = str.match(N.re.include)) {
-				N.ajax(include[1], function(d){
+			else if (include = str.match(curlyTags.re.include)) {
+				curlyTags.ajax(include[1], function(d){
 					str = str.replace(include[0], d);
 					// Update the layout cache so we don't need to run through the include tests next time.
-					//for(var i in N.cache.layouts)
-					//	N.cache.layouts[i] = N.cache.layouts[i].replace(include[0], d);
+					//for(var i in curlyTags.cache.layouts)
+					//	curlyTags.cache.layouts[i] = curlyTags.cache.layouts[i].replace(include[0], d);
 
-					N.render_string_c(str, D, fn);
+					curlyTags.render_string_c(str, D, fn);
 				}, true);
 			}
 			else if(fn)
-				fn(N.render_string(str, D));
+				fn(curlyTags.render_string(str, D));
 		},
 		
 		/**
@@ -640,8 +641,8 @@ N.extend(N,{
 		 */
 		replace_blocks: function(c, b) {
 			for (var i in c)
-				if(!N.is(c[i], "string") && c[i].type == "block")
-					c[i].content = (b[c[i].condition]) ? b[c[i].condition] : N.replace_blocks(c[i].content, b);
+				if(!curlyTags.is(c[i], "string") && c[i].type == "block")
+					c[i].content = (b[c[i].condition]) ? b[c[i].condition] : curlyTags.replace_blocks(c[i].content, b);
 			return c;
 		},
 		
@@ -690,7 +691,7 @@ N.extend(N,{
 			},
 			
 			dictsortreversed: function(d, f) {
-				return N.filters.dictsort(d, f, -1);
+				return curlyTags.filters.dictsort(d, f, -1);
 			},
 			
 			divisibleby: function(v, c) {
@@ -703,7 +704,7 @@ N.extend(N,{
 				while(c > 1024 && i++ < 5)
 					c = c / 1024;
 				
-				return N.filters.floatformat(c,'-1') + ' ' + r[i];
+				return curlyTags.filters.floatformat(c,'-1') + ' ' + r[i];
 			},
 			
 			first: function(v) {
@@ -724,7 +725,7 @@ N.extend(N,{
 			},
 			
 			get_digit: function(v, d) {
-				if (N.is(v,"number")) {
+				if (curlyTags.is(v,"number")) {
 					v = Math.floor(v)+"";
 					return (d > v.length || v < 1) ? 0 : (d < 1) ? v : v[v.length-d];
 				}
@@ -734,7 +735,7 @@ N.extend(N,{
 			join: function() {
 				var out = [], v, s = arguments[arguments.length-1];
 				
-				if(N.is(arguments[0],'array'))
+				if(curlyTags.is(arguments[0],'array'))
 					return arguments[0].join(s);
 				
 				for(var i = 0; i < arguments.length-1; i++)
@@ -770,7 +771,7 @@ N.extend(N,{
 			
 			make_list: function(v) {
 				var V = v+"", out = [];
-				if(N.is(v, "number"))
+				if(curlyTags.is(v, "number"))
 					for(var i in V)
 						out.push(V[i]*1);
 				else
@@ -805,7 +806,7 @@ N.extend(N,{
 			},
 			
 			striptags: function(v) {
-				return N.filters.removetags(v);
+				return curlyTags.filters.removetags(v);
 			},
 			
 			upper: function(v) {
@@ -817,7 +818,7 @@ N.extend(N,{
 			},
 
 			trans: function(v) {
-				return N.i18n.get(v, true);
+				return curlyTags.i18n.get(v, true);
 			},
 			
 			replace: function(v, s1, s2) {
@@ -832,7 +833,7 @@ N.extend(N,{
 		blocktags: {
 			
 			block: function(a, d){
-				return N.render_string(this.content, d);
+				return curlyTags.render_string(this.content, d);
 			},
 			
 			"if": function(a, d) {
@@ -847,24 +848,24 @@ N.extend(N,{
 					ctype = "and";
 				
 				for (var i = 0; i < conds.length; i++) {
-					var _c = (conds[i].indexOf('not ') > -1) ? !N.evalvar(N.strsplit(conds[i])[1], d) : N.evalvar(conds[i], d);
+					var _c = (conds[i].indexOf('not ') > -1) ? !curlyTags.evalvar(curlyTags.strsplit(conds[i])[1], d) : curlyTags.evalvar(conds[i], d);
 
-					if(N.is(_c, "array") && _c.length == 0)
+					if(curlyTags.is(_c, "array") && _c.length == 0)
 						_c = false;
 					
 					cond = (ctype == "" || cond == undefined) ? _c : (ctype == "or") ? (cond || _c) : (cond && _c); 
 				}
 				
-				return N.render_string(cond ? this.content : (this.elsecontent || ""), d); 
+				return curlyTags.render_string(cond ? this.content : (this.elsecontent || ""), d); 
 			},
 			
 			ifequal: function(a, d) {
-				var vars = N.strsplit(this.condition);
+				var vars = curlyTags.strsplit(this.condition);
 				
-				if(N.evalvar(vars[0], d) == N.evalvar(vars[1], d))
-					return N.render_string(this.content, d);
+				if(curlyTags.evalvar(vars[0], d) == curlyTags.evalvar(vars[1], d))
+					return curlyTags.render_string(this.content, d);
 				else if(this.elsecontent)
-					return N.render_string(this.elsecontent, d);
+					return curlyTags.render_string(this.elsecontent, d);
 
 				return "";
 			},
@@ -875,20 +876,20 @@ N.extend(N,{
 				if(vars.length < 2) 
 					throw new Error("Template error: for blocktag expects a string on the format 'for name in list'");
 								
-				var fd = N._parsevar(vars[1], d);
+				var fd = curlyTags._parsevar(vars[1], d);
 				if (!fd) {
 					if(this.elsecontent)
-						out.push(N.render_string(this.elsecontent, d));
+						out.push(curlyTags.render_string(this.elsecontent, d));
 				}
 				else {
 					var vn, dn, dO, ns;
 					if (vars[0].indexOf(',')>-1) {
 						ns = vars[0].split(',');
-						vn = ns[0].replace(N.re.trim,'');
-						dn = ns[1].replace(N.re.trim,'');
+						vn = ns[0].replace(curlyTags.re.trim,'');
+						dn = ns[1].replace(curlyTags.re.trim,'');
 					}
 					else
-						dn = vars[0].replace(N.re.trim,'');
+						dn = vars[0].replace(curlyTags.re.trim,'');
 
 					dO = {
 						forloop:{
@@ -907,7 +908,7 @@ N.extend(N,{
 						dO[vn] = _var;
 						dO[dn] = fd[_var];
 
-						out.push(N.render_string(this.content, d, dO));
+						out.push(curlyTags.render_string(this.content, d, dO));
 
 						dO.forloop.counter++;
 						dO.forloop.counter0++;
@@ -923,26 +924,26 @@ N.extend(N,{
 			},
 			
 			ifnotequal: function(a, d) {
-				var vars = N.strsplit(this.condition);
+				var vars = curlyTags.strsplit(this.condition);
 
-				if(N.evalvar(vars[0], d) != N.evalvar(vars[1], d))
-					return N.render_string(this.content, d);
+				if(curlyTags.evalvar(vars[0], d) != curlyTags.evalvar(vars[1], d))
+					return curlyTags.render_string(this.content, d);
 				else if(this.elsecontent)
-					return N.render_string(this.elsecontent, d);
+					return curlyTags.render_string(this.elsecontent, d);
 
 				return "";
 			},
 			
 			ifchanged: function(a, d) {
-				var icc = N.render_string(this.content, d);
+				var icc = curlyTags.render_string(this.content, d);
 				var comp;
 				if(!d.forloop)
 					return icc;
 				else {
 					if(this.condition) {
-						var vars = N.strsplit(this.condition), iccvars = [];
+						var vars = curlyTags.strsplit(this.condition), iccvars = [];
 						for (var v in vars)
-							iccvars.push(N.evalvar(vars[v], d));
+							iccvars.push(curlyTags.evalvar(vars[v], d));
 						comp = iccvars.join('|');
 					}
 					else
@@ -962,7 +963,7 @@ N.extend(N,{
 						}
 						else if (this.elsecontent) 
 							d.forloop.ifchangedcounter++;
-							return N.render_string(this.elsecontent, d);
+							return curlyTags.render_string(this.elsecontent, d);
 					}
 				}
 			},
@@ -973,14 +974,14 @@ N.extend(N,{
 			
 			firstof: function(A, d) {
 				for(var a in A)
-					if(N.evalvar(A[a],d))
-						return N.evalvar(A[a],d);
+					if(curlyTags.evalvar(A[a],d))
+						return curlyTags.evalvar(A[a],d);
 
-				return N.evalvar(A[A.length-1],d);
+				return curlyTags.evalvar(A[A.length-1],d);
 			},
 
 			trans: function(a, d) {
-				return N.i18n.get(N.evalvar(a[0], d));
+				return curlyTags.i18n.get(curlyTags.evalvar(a[0], d));
 			},
 			
 			// load is not yet implemented
@@ -993,26 +994,26 @@ N.extend(N,{
 			},
 			
 			cycle: function(a, d) {
-				return N.evalvar(a.length ? a[(d.forloop ? d.forloop.counter0 : 0) % a.length] : a, d);
+				return curlyTags.evalvar(a.length ? a[(d.forloop ? d.forloop.counter0 : 0) % a.length] : a, d);
 			},
 
 			spaceless: function(a, d) {
-				return N.render_string(this.content, d).replace(/\>\s+\</gi, '><');
+				return curlyTags.render_string(this.content, d).replace(/\>\s+\</gi, '><');
 			},
 			
 			widthratio: function(a, d) {
-				return Math.round(N.evalvar(a[0], d)/N.evalvar(a[1], d)*N.evalvar(a[2], d));
+				return Math.round(curlyTags.evalvar(a[0], d)/curlyTags.evalvar(a[1], d)*curlyTags.evalvar(a[2], d));
 			},
 			
 			"with": function(a, d) {
 				var vars = this.condition.split('as'), dO = {};
 				
 				if(vars.length > 1)
-					dO[vars[1].replace(N.re.trim, '')] = N.evalvar(vars[0], d);
+					dO[vars[1].replace(curlyTags.re.trim, '')] = curlyTags.evalvar(vars[0], d);
 				else
-					dO = N.evalvar(vars[0], d);
+					dO = curlyTags.evalvar(vars[0], d);
 				
-				return N.render_string(this.content, N.extend({}, d, dO));
+				return curlyTags.render_string(this.content, curlyTags.extend({}, d, dO));
 				
 			},
 			
@@ -1030,11 +1031,11 @@ N.extend(N,{
 			},
 			
 			filter: function(a, d) {
-				var c = N.render_string(this.content, d),
-					n = N.uuid(),
+				var c = curlyTags.render_string(this.content, d),
+					n = curlyTags.uuid(),
 					o = {};
 				o[n] = c;
-				return N.render_string("{{ "+n+"|"+this.condition+" }}",o);
+				return curlyTags.render_string("{{ "+n+"|"+this.condition+" }}",o);
 			}
 
 		},
@@ -1047,9 +1048,9 @@ N.extend(N,{
 		 * @param {Object} v
 		 */
 		varssplit: function(v) {
-			var L = v.match(N.re.varsplit), o =[], v, l = L.length;
+			var L = v.match(curlyTags.re.varsplit), o =[], v, l = L.length;
 			for (var i = 0; i < l; i++) {
-				v = L[i].replace(N.re.trimcs, '');
+				v = L[i].replace(curlyTags.re.trimcs, '');
 				if(v) 
 					o.push(v);
 			}
@@ -1061,10 +1062,10 @@ N.extend(N,{
 		 * @param {Object} v
 		 */
 		strsplit: function(v) {
-			var S = v.match(N.re.strsplit), o = [];
+			var S = v.match(curlyTags.re.strsplit), o = [];
 
 			for(var i = 0, s = S.length; i < s; i++)
-				if(S[i].replace(N.re.trim, ''))
+				if(S[i].replace(curlyTags.re.trim, ''))
 					o.push(S[i]);
 
 			return o;
@@ -1077,7 +1078,7 @@ N.extend(N,{
 		 * @param {Object} d
 		 */
 		evalvar: function(v, d) {
-			v = v.replace(N.re.trim, '');
+			v = v.replace(curlyTags.re.trim, '');
 			
 			// Keyword __all__ means the current data object. This is useful
 			// when creating, say, a custom tag function for an input that's connected to a 
@@ -1097,7 +1098,7 @@ N.extend(N,{
 			
 			// String value
 			else if (v.substring(0, 1) == '"' || v.substring(0, 1) == "'") 
-				v = v.replace(N.re.trimq, '');
+				v = v.replace(curlyTags.re.trimq, '');
 			
 			// Integer/float value
 			else if (v * 1 + '' === v) 
@@ -1112,7 +1113,7 @@ N.extend(N,{
 				
 				else if(vs[0] == 'user'){
 					vs.shift();
-					d = N.user.prefs;
+					d = curlyTags.user.prefs;
 				}
 				
 				v = d[vs.shift()];
@@ -1141,12 +1142,12 @@ N.extend(N,{
 			for(var a in arr) {
 				if(arr[a].indexOf(':')>-1) {
 					spl = arr[a].split(':');
-					val = N.evalvar(spl[1], d);
+					val = curlyTags.evalvar(spl[1], d);
 					out[spl[0]] = val;
 					out.push(val);
 				}
 				else
-					out.push(N.evalvar(arr[a], d));
+					out.push(curlyTags.evalvar(arr[a], d));
 			}
 			return out;
 		},
@@ -1159,13 +1160,13 @@ N.extend(N,{
 	i18n: {
 		currentLanguage: 'sv',
 		get: function(s) {
-			return (N.i18n.defs[N.i18n.currentLanguage][s.toUpperCase()] || s);
+			return (curlyTags.i18n.defs[curlyTags.i18n.currentLanguage][s.toUpperCase()] || s);
 		},
 		set: function(n, v, l) {
-			l = l || N.i18n.currentLanguage;
-			if(!N.i18n.defs[l])
-				N.i18n.defs[l] = [];
-			N.i18n.defs[l][n.toUpperCase()] = v;
+			l = l || curlyTags.i18n.currentLanguage;
+			if(!curlyTags.i18n.defs[l])
+				curlyTags.i18n.defs[l] = [];
+			curlyTags.i18n.defs[l][n.toUpperCase()] = v;
 		},
 		defs: []
 	}
@@ -1175,9 +1176,9 @@ N.extend(N,{
 // Some initializations
 var S = 'if,ifequal,ifnotequal,for,comment,form,with,ifchanged,spaceless,filter,block'.split(',');
 for(var s in S){
-	N.re.pairs['end'+S[s]] = new RegExp('^\\{\\%\\s*' + S[s] + '\\s+', 'i');
-	N.defs.startblocks.push(S[s]);
-	N.defs.endblocks.push('end'+S[s]);
+	curlyTags.re.pairs['end'+S[s]] = new RegExp('^\\{\\%\\s*' + S[s] + '\\s+', 'i');
+	curlyTags.defs.startblocks.push(S[s]);
+	curlyTags.defs.endblocks.push('end'+S[s]);
 }
 
 
@@ -1219,10 +1220,10 @@ for(var s in S){
 		if(scripts[i].src && scripts[i].src.indexOf('bam.tpl.js?') > -1) {
 		
 			if(scripts[i].src.indexOf('autoload=0') > -1)
-				N.autoload = false;
+				curlyTags.autoload = false;
 		
 			if(scripts[i].src.indexOf('fullextend=0') > -1)
-				N.fullextend = false;
+				curlyTags.fullextend = false;
 		
 			break;
 		}
@@ -1230,30 +1231,30 @@ for(var s in S){
 	
 	
 	// Autoload is turned on by default
-	if(N.autoload){
+	if(curlyTags.autoload){
 		
-		var root = N.root || document.body;
-		N._originalroot = root.innerHTML;
+		var root = curlyTags.root || document.body;
+		curlyTags._originalroot = root.innerHTML;
 		
-		N.render_string_c(root.innerHTML, N.data || window, function(str){
+		curlyTags.render_string_c(root.innerHTML, curlyTags.data || window, function(str){
 			root.innerHTML = str;
 			document.body.style.visibility = 'visible';
 
 	
 			// If parse links is turned on, external css is also processed.
-			if(N.parselinks) {
+			if(curlyTags.parselinks) {
 				var links = document.getElementsByTagName("link"), node;
 				if(links) {
 					for(var o = 0, l = links.length; o < l; o++){
 						node = links[o];
 						if(node && node.rel == "stylesheet") {
-	 						N.ajax(node.href, function(d){
+	 						curlyTags.ajax(node.href, function(d){
 								var style = document.createElement("style");
 								node.parentNode.replaceChild(style, node);
 								if(style.styleSheet)
-									style.styleSheet.cssText = N.render_string(d, N.data || window);
+									style.styleSheet.cssText = curlyTags.render_string(d, curlyTags.data || window);
 								else
-									style.appendChild(document.createTextNode(N.render_string(d, N.data || window)));
+									style.appendChild(document.createTextNode(curlyTags.render_string(d, curlyTags.data || window)));
 							});
 						}
 					}
@@ -1262,14 +1263,14 @@ for(var s in S){
 
 			// Parsing styletags is on by default
 			// TODO: check if every browser has the innerHTML attribute on style tags. 
-			if(N.parsecss) {
+			if(curlyTags.parsecss) {
 
 				if(styles = document.getElementsByTagName("style")) {
 					for(var s = 0, l = styles.length; s < l; s++) {
 						if(styles[s].styleSheet)
-							styles[s].styleSheet.cssText = N.render_string(styles[s].innerHTML, N.data || window);
+							styles[s].styleSheet.cssText = curlyTags.render_string(styles[s].innerHTML, curlyTags.data || window);
 						else
-							styles[s].textContent = N.render_string(styles[s].innerHTML, N.data || window);
+							styles[s].textContent = curlyTags.render_string(styles[s].innerHTML, curlyTags.data || window);
 					}
 				}
 			}

@@ -1,4 +1,4 @@
-bam.loadData({
+curlyTags.loadData({
 	bgcolor: 'red',
 	looks : {
 		cycle_color: 'green'
