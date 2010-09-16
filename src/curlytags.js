@@ -1071,7 +1071,7 @@ curlyTags.extend(curlyTags,{
 			return curlyTags.i18n.get(curlyTags.evalvar(a[0], d));
 		},
 		
-		// load is not yet implemented
+		// load is not yet implemented, not sure if it will be.
 		load: function(a, d) {
 			return "";
 		},
