@@ -1303,7 +1303,7 @@ for(var s in S){
 	// Reading some url parameters
 	var scripts = document.getElementsByTagName("script");
 	for(var i = 0, l = scripts.length; i < l; i++) {
-		if(scripts[i].src && scripts[i].src.indexOf('bam.tpl.js?') > -1) {
+		if(scripts[i].src && scripts[i].src.indexOf('curlytags.js?') > -1) {
 		
 			if(scripts[i].src.indexOf('autoload=0') > -1)
 				curlyTags.autoload = false;
